@@ -1,0 +1,48 @@
+
+1. nntool_script的优化使用策略，针对不同模型，大体上如何更优化?
+##Template
+adjust
+fusions
+set ...  ？
+save_state
+
+
+
+2. main.c逻辑顺序及细节。哪些是固定套路，哪些需要自定义，特别是模型算子的定义和编译模型
+//1. Initialize & open ram
+//2. Allocate l2 for input image
+//3. Allocate output buffer
+//4. Configure And open cluster.
+//5. Network Constructor
+//6. Task setup
+//7. Netwrok Destructor and close cluster
+
+共有好几处分配pmsis_l1_malloc，pmsis_l2_malloc，怎么考虑地？
+
+AT_Construct
+AT_Destruct
+AT_CNN
+这几个是Autotiler自动命名的还是配置的？
+image input如何读进来的？
+
+
+3. Makefile的基本编译和运行逻辑
+#1. nntool -s $(NNTOOL_SCRIPT) $(MODEL_BUILD)/$(MODEL_NAME)
+#2. nntool -g -M $(MODEL_BUILD) -m $(MODEL_SRC) -T $(TENSORS_DIR) -H $(MODEL_HEADER) $(MODEL_GENFLAGS_EXTRA) $<
+
+#3. gcc -g -o $(MODEL_GEN_EXE) -I. -I$(TILER_INC) -I$(TILER_EMU_INC) $(CNN_GEN_INCLUDE) $(CNN_LIB_INCLUDE) $(MODEL_BUILD)/$(MODEL_SRC) $(CNN_GEN) $(TILER_LIB)
+#4. $(MODEL_GEN_EXE) -o $(MODEL_BUILD) -c $(MODEL_BUILD) $(MODEL_GEN_EXTRA_FLAGS)
+model: $(MODEL_GEN_EXE)
+all::model
+include $(RULES_DIR)/pmsis_rules.mk
+
+
+解释各个链接的内容？
+APP_CFLAGS 起什么作用？
+BUILD(均会生成)和BUILD_MODEL_16BIT之间区别？
+nntool自动生成$(MODEL_SRC)=bodydetectionModel.c，仅仅来自与tflite？
+SSDModel.c SSDParams.c bodydetectionModel.c之间联系？
+如何自己写Model.c？
+其他库文件能否链接编译进来，比如opencv?
+
+
